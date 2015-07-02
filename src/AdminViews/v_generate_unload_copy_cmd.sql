@@ -21,7 +21,7 @@ FROM
 		schemaname
 		,tablename
 		,'unload' AS cmd_type
-		,'UNLOAD (''SELECT * FROM ' + schemaname + '.' + tablename + ' --WHERE audit_id > ___auditid___'') TO ''s3://__bucketname__/' + TO_CHAR(GETDATE(), 'YYYYMMDD_HH24MISSMS')  + '/'  + schemaname + '.' + tablename + '-'' CREDENTIALS ''__creds_here__'' GZIP DELIMITER ''\\t'';' AS dml
+		,'UNLOAD (''SELECT * FROM "' + schemaname + '"."' + tablename + '" --WHERE audit_id > ___auditid___'') TO ''s3://__bucketname__/' + TO_CHAR(GETDATE(), 'YYYYMMDD_HH24MISSMS')  + '/'  + schemaname + '.' + tablename + '-'' CREDENTIALS ''__creds_here__'' GZIP DELIMITER ''\\t'';' AS dml
 	FROM 
 		pg_tables 
 	UNION ALL
@@ -29,7 +29,7 @@ FROM
 		schemaname
 		,tablename
 		,'copy' AS cmd_type
-		,'COPY ' + schemaname + '.' + tablename + ' FROM ''s3://__bucketname__/' + TO_CHAR(GETDATE(), 'YYYYMMDD_HH24MISSMS')  + '/'  + schemaname + '.' + tablename + '-'' CREDENTIALS ''__creds_here__'' GZIP DELIMITER ''\\t'';' AS copy_dml
+		,'COPY "' + schemaname + '"."' + tablename + '" FROM ''s3://__bucketname__/' + TO_CHAR(GETDATE(), 'YYYYMMDD_HH24MISSMS')  + '/'  + schemaname + '.' + tablename + '-'' CREDENTIALS ''__creds_here__'' GZIP DELIMITER ''\\t'';' AS copy_dml
 	FROM 
 		pg_tables 
 	)
