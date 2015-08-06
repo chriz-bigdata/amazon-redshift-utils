@@ -15,14 +15,13 @@ WITH
 			,split_part(lower(trim(replace(replace(s.text,';',''),':',''))),' ',1) cmd
 			,s.starttime cmd_starttime
 			,s.endtime cmd_endtime
-			,cs.startqueue 
+			,cs.startqueue as xid_startqueue
 			,cs.startwork
 			,cs.endtime commit_endtime
 			,cs.queuelen
 			,xb.newblocks
 			,xb.dirtyblocks
 			,xb.headers
-			-- Add xid_dur_ms where rank=1 for s.starttime until cs.startqueue
 			,datediff(ms,s.starttime,s.endtime) cmd_dur_ms
 			,datediff(ms,cs.startqueue,cs.startwork) commit_queue_dur_ms
 			,datediff(ms,cs.startqueue,cs.endtime) total_commit_dur_ms
@@ -39,9 +38,10 @@ WITH
 			AND cs.endtime > cs.startqueue)
 SELECT 
 	xid
-	,LISTAGG(cmd,'|') WITHIN GROUP (ORDER BY xids.rank)
-	,SUM(cmd_dur_ms) xid_cmd_dur_ms
-	,datediff(ms,MIN(cmd_starttime),MAX(commit_endtime)) AS xid_dur_ms 
+	,LISTAGG(cmd,'|') WITHIN GROUP (ORDER BY xids.rank) cmd_pattern
+	,SUM(cmd_dur_ms) xid_cmds_dur_sum_ms
+	,datediff(ms,MIN(cmd_starttime),MAX(xid_startqueue)) xid_cmds_dur_ms
+	,datediff(ms,MIN(cmd_starttime),MAX(commit_endtime)) total_xid_dur_ms 
 FROM
 	xids
 WHERE (1=1)
