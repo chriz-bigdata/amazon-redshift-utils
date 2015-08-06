@@ -32,7 +32,8 @@ WITH
 		JOIN stl_commit_stats cs USING (xid)
 		JOIN xid_blocks xb USING (xid)
 		WHERE (1=1)
-			AND s.sequence=0
+			AND s.sequence = 0
+			AND s.userid > 1
 			AND cs.node = -1
 			AND cs.xid > 0
 			AND cs.endtime > cs.startqueue)
@@ -40,9 +41,9 @@ SELECT
 	xid
 	,LISTAGG(cmd,'|') WITHIN GROUP (ORDER BY xids.rank)
 	,SUM(cmd_dur_ms) xid_cmd_dur_ms
-	,AVG(newblocks) xid_newblocks
-	,AVG(dirtyblocks) xid_dirtyblocks
-	,AVG(headers) xid_headers
+	,datediff(ms,MIN(cmd_starttime),MAX(commit_endtime)) AS xid_dur_ms 
 FROM
 	xids
+WHERE (1=1)
+	AND cmd <> 'padb_fetch_sample'
 GROUP BY xid;
