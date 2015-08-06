@@ -35,15 +35,23 @@ WITH
 			AND s.userid > 1
 			AND cs.node = -1
 			AND cs.xid > 0
-			AND cs.endtime > cs.startqueue)
-SELECT 
-	xid
-	,LISTAGG(cmd,'|') WITHIN GROUP (ORDER BY xids.rank) cmd_pattern
-	,SUM(cmd_dur_ms) xid_cmds_dur_sum_ms
-	,datediff(ms,MIN(cmd_starttime),MAX(xid_startqueue)) xid_cmds_dur_ms
-	,datediff(ms,MIN(cmd_starttime),MAX(commit_endtime)) total_xid_dur_ms 
+			AND cs.endtime > cs.startqueue),
+	cmds AS
+		(SELECT 
+			xid
+			,LISTAGG(cmd,'|') WITHIN GROUP (ORDER BY xids.rank) cmd_pattern
+			,SUM(cmd_dur_ms) xid_cmds_dur_sum_ms
+			,datediff(ms,MIN(cmd_starttime),MAX(xid_startqueue)) xid_cmds_dur_ms
+			,datediff(ms,MIN(cmd_starttime),MAX(commit_endtime)) total_xid_dur_ms 
+			,AVG(xids.newblocks) xid_newblocks
+			,AVG(xids.dirtyblocks) xid_dirtyblocks
+			,AVG(xids.headers) xid_headers
+		FROM
+			xids
+		WHERE (1=1)
+			AND cmd <> 'padb_fetch_sample'
+		GROUP BY xid)
+SELECT cmd_pattern
+	,
 FROM
-	xids
-WHERE (1=1)
-	AND cmd <> 'padb_fetch_sample'
-GROUP BY xid;
+	cmds
