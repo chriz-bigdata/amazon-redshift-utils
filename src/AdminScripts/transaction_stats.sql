@@ -22,6 +22,8 @@ WITH
 		,xb.newblocks
 		,xb.dirtyblocks
 		,xb.headers
+		-- Add xid_dur_ms where rank=1 for s.starttime until cs.startqueue
+		,datediff(ms,s.starttime,s.endtime) cmd_dur_ms
 		,datediff(ms,cs.startqueue,cs.startwork) commit_queue_dur_ms
 		,datediff(ms,cs.startqueue,cs.endtime) total_commit_dur_ms
 		,datediff(ms,cs.startwork,cs.endtime) commit_work_dur_ms
