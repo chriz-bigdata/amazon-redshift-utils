@@ -52,6 +52,21 @@ WITH
 			AND cmd <> 'padb_fetch_sample'
 		GROUP BY xid)
 SELECT cmd_pattern
-	,
+	,COUNT(*)
+	,MIN(xid_newblocks) min_xid_newblocks
+	,AVG(xid_newblocks) avg_xid_newblocks
+	,MAX(xid_newblocks) max_xid_newblocks
+	,MIN(xid_dirtyblocks) min_xid_dirtyblocks
+	,AVG(xid_dirtyblocks) avg_xid_dirtyblocks
+	,MAX(xid_dirtyblocks) max_xid_dirtyblocks
+	,MIN(xid_headers) min_xid_headers
+	,AVG(xid_headers) avg_xid_headers
+	,MAX(xid_headers) max_xid_headers
+	,AVG(xid_cmds_dur_sum_ms) avg_xid_cmds_dur_sum_ms
+	,AVG(xid_cmds_dur_ms) avg_xid_cmds_dur_ms
+	,AVG(total_xid_dur_ms) avg_total_xid_dur_ms
 FROM
 	cmds
+GROUP BY 
+	cmd_pattern
+ORDER BY 2 DESC;
